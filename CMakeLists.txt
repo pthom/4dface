@@ -110,6 +110,10 @@ include_directories(${glm_INCLUDE_DIR})
 add_executable(4dface apps/4dface.cpp apps/helpers.hpp)
 target_link_libraries(4dface ${OpenCV_LIBS} ${Boost_LIBRARIES})
 
+add_executable(testPascal apps/testPascal.cpp apps/helpers.hpp)
+target_link_libraries(testPascal ${OpenCV_LIBS} ${Boost_LIBRARIES})
+
+
 # install targets:
 install(TARGETS 4dface DESTINATION bin)
 install(FILES ${eos_DIR}/share/sfm_shape_3448.bin DESTINATION share)

@@ -1,3 +1,11 @@
+include("cmake/Hunter/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.18.14.tar.gz"
+    SHA1 "704100864c42effdb57fa445a7a894d226842139"
+		LOCAL
+    #FILEPATH "${CMAKE_SOURCE_DIR}/cmake/Hunter/config.cmake"		
+)
+
 project(4dface)
 cmake_minimum_required(VERSION 2.8.10)
 set(4dface_VERSION_MAJOR 0)
@@ -43,7 +51,9 @@ set(CPACK_PACKAGE_VERSION_PATCH "${4dface_VERSION_PATCH}")
 include(CPack)
 
 # Find dependencies:
-find_package(OpenCV 2.4.3 REQUIRED core imgproc highgui objdetect) # in 3.0: require videoio? Plus the thing Michael fixed for eos?
+hunter_add_package(OpenCV)
+#find_package(OpenCV 2.4.3 REQUIRED core imgproc highgui objdetect) # in 3.0: require videoio? Plus the thing Michael fixed for eos?
+find_package(OpenCV REQUIRED core imgproc highgui objdetect) # in 3.0: require videoio? Plus the thing Michael fixed for eos?
 message(STATUS "OpenCV include dir found at ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "OpenCV library dir found at ${OpenCV_LIB_DIR}")
 set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
@@ -52,18 +62,23 @@ set_target_properties(${OpenCV_LIBS} PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBIN
 if(NOT OpenCV_haarcascades_DIR)
 	# This will fail for system-packaged OpenCV
 	list(GET OpenCV_INCLUDE_DIRS 0 OpenCV_first_include_dir)
-	set(OpenCV_haarcascades_DIR "${OpenCV_first_include_dir}/../share/OpenCV/haarcascades")
+	set(OpenCV_haarcascades_DIR "${OpenCV_first_include_dir}/../etc/haarcascades")
 endif()
 if(NOT EXISTS "${OpenCV_haarcascades_DIR}/haarcascade_frontalface_alt2.xml")
 	message(FATAL_ERROR "Could not find OpenCV's face detector haarcascade_frontalface_alt2.xml in ${OpenCV_haarcascades_DIR}. Please set OpenCV_haarcascades_DIR to the directory with that file.")
 endif()
 
+# BOOST
 if(MSVC)
 	# The standard find_package for boost on Win finds the dynamic libs, so for dynamic linking to boost we need to #define:
-	add_definitions(-DBOOST_ALL_NO_LIB) # Don't use the automatic library linking by boost with VS (#pragma ...). Instead, we specify everything here in cmake.
-	add_definitions(-DBOOST_ALL_DYN_LINK) # Link against the dynamic boost lib - needs to match with the version that find_package finds.
+	#add_definitions(-DBOOST_ALL_NO_LIB) # Don't use the automatic library linking by boost with VS (#pragma ...). Instead, we specify everything here in cmake.
+	#add_definitions(-DBOOST_ALL_DYN_LINK) # Link against the dynamic boost lib - needs to match with the version that find_package finds.
+	set(Boost_USE_STATIC_LIBS ON)
+	add_definitions(-DBOOST_ALL_NO_LIB=1)
 endif()
-find_package(Boost 1.48.0 COMPONENTS system filesystem program_options REQUIRED)
+hunter_add_package(Boost COMPONENTS system filesystem program_options)
+#find_package(Boost 1.48.0 COMPONENTS system filesystem program_options REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 if(Boost_FOUND)
   message(STATUS "Boost found at ${Boost_INCLUDE_DIRS}")
 else(Boost_FOUND)

@@ -240,7 +240,14 @@ int main(int argc, char *argv[])
 
 		// Render the model in a separate window using the estimated pose, shape and merged texture:
 		Mat rendering;
-		std::tie(rendering, std::ignore) = render::render(merged_mesh, fitting::to_mat(glm::rotate(glm::mat4(1.0f), rendering_params.r_z, glm::vec3{ 0.0f, 0.0f, 1.0f }) * glm::rotate(glm::mat4(1.0f), rendering_params.r_x, glm::vec3{ 1.0f, 0.0f, 0.0f }) * glm::rotate(glm::mat4(1.0f), rendering_params.r_y, glm::vec3{ 0.0f, 1.0f, 0.0f })), fitting::to_mat(glm::ortho(-130.0f, 130.0f, -130.0f, 130.0f)), 256, 256, render::create_mipmapped_texture(merged_isomap), true, false, false);
+		std::tie(rendering, std::ignore) =
+      render::render(merged_mesh,
+                     fitting::to_mat(glm::rotate(glm::mat4(1.0f),
+                                                 rendering_params.r_z,
+                                                 glm::vec3{ 0.0f, 0.0f, 1.0f }) * glm::rotate(glm::mat4(1.0f), rendering_params.r_x, glm::vec3{ 1.0f, 0.0f, 0.0f }) * glm::rotate(glm::mat4(1.0f), rendering_params.r_y, glm::vec3{ 0.0f, 1.0f, 0.0f })),
+                     fitting::to_mat(glm::ortho(-130.0f, 130.0f, -130.0f, 130.0f)), 512, 512,
+                     render::create_mipmapped_texture(merged_isomap),
+                     true, false, false);
 		cv::imshow("render", rendering);
 
 		cv::imshow("video", frame);
